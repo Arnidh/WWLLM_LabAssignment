@@ -132,10 +132,9 @@ def run_mcq_eval(
                         "q_index": i + 1,
                         "question_preview": mcq.get("question", "")[:80],
                         "auto_valid": all_ok,
-                        # TODO: fill in manually
-                        "clarity_1_5": "TODO",
-                        "correctness_1_5": "TODO",
-                        "distractor_quality_1_5": "TODO",
+                        "clarity_1_5": "",
+                        "correctness_1_5": "",
+                        "distractor_quality_1_5": "",
                         "rater_notes": "",
                     }
                 )
@@ -156,7 +155,7 @@ def run_mcq_eval(
             writer.writerows(rating_rows)
 
     print(f"\nAuto results: {output_csv}")
-    print(f"Rating template: {ratings_template_csv}  ← fill in manually")
+    print(f"Rating template: {ratings_template_csv}  (rating fields are intentionally blank)")
 
 
 if __name__ == "__main__":
@@ -174,4 +173,3 @@ if __name__ == "__main__":
         args.output_csv,
         args.ratings_template,
     )
-

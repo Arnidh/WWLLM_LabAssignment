@@ -89,6 +89,69 @@ MOCK_MCQS = [
     },
 ]
 
+MOCK_MCQS_EN = [
+    {
+        "question": "What happens to an object when no external force acts on it?",
+        "options": {
+            "A": "It remains at rest",
+            "B": "It always speeds up",
+            "C": "It changes direction",
+            "D": "It disappears",
+        },
+        "answer": "A",
+        "explanation": "Newton's first law says an object remains at rest unless an external force acts on it.",
+        "evidence": "Newton's first law states that an object remains at rest unless an external force acts on it.",
+    },
+    {
+        "question": "What does Newton's second law say force equals?",
+        "options": {
+            "A": "Mass times acceleration",
+            "B": "Velocity times distance",
+            "C": "Energy divided by time",
+            "D": "Area times density",
+        },
+        "answer": "A",
+        "explanation": "The second law relates force to mass and acceleration.",
+        "evidence": "Newton's second law states that force equals mass times acceleration.",
+    },
+    {
+        "question": "What does Newton's third law describe?",
+        "options": {
+            "A": "Force equals mass times acceleration",
+            "B": "An object's inertia",
+            "C": "Equal and opposite reactions",
+            "D": "Conservation of energy",
+        },
+        "answer": "C",
+        "explanation": "The third law describes action and reaction.",
+        "evidence": "Newton's third law states that every action has an equal and opposite reaction.",
+    },
+    {
+        "question": "Which application of Newton's laws is mentioned?",
+        "options": {
+            "A": "Cooking",
+            "B": "Rocket science",
+            "C": "Music",
+            "D": "Chemistry only",
+        },
+        "answer": "B",
+        "explanation": "The lecture mentions rocket science as an application.",
+        "evidence": "These laws are used in rocket science.",
+    },
+    {
+        "question": "Besides rocket science, where do these laws apply?",
+        "options": {
+            "A": "Vehicle design and sports",
+            "B": "Music and cooking",
+            "C": "Chemistry and painting",
+            "D": "Only in laboratories",
+        },
+        "answer": "A",
+        "explanation": "The lecture also mentions vehicle design and sports.",
+        "evidence": "They also apply to vehicle design and sports.",
+    },
+]
+
 
 class MCQOptions(BaseModel):
     model_config = ConfigDict(extra="forbid")
@@ -322,9 +385,10 @@ def make_mcqs(
     """Generate exactly five MCQs and reject unsupported evidence."""
     if is_mock_mode():
         logger.info("MOCK MODE: returning canned MCQs")
+        mock_mcqs = MOCK_MCQS_EN if lang == "en" else MOCK_MCQS
         return QuizResult(
-            mcqs=[dict(item) for item in MOCK_MCQS],
-            raw_json=json.dumps(MOCK_MCQS, ensure_ascii=False, indent=2),
+            mcqs=[dict(item) for item in mock_mcqs],
+            raw_json=json.dumps(mock_mcqs, ensure_ascii=False, indent=2),
             attempts=1,
             latency_s=0.01,
         )

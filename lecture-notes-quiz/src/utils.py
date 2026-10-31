@@ -193,8 +193,8 @@ def normalize_text(text: str) -> str:
     """
     Normalise text before WER/CER computation:
     1. Unicode NFC normalisation
-    2. Strip punctuation while keeping letters (including Devanagari conjuncts),
-       digits, whitespace, and Devanagari halant (U+094D / ्) and nukta (U+093C).
+    2. Strip punctuation while keeping Unicode letters, digits, whitespace, and
+       combining marks used by Indic conjuncts and vowel signs.
     3. Collapse whitespace
     4. Lowercase
 
@@ -203,10 +203,13 @@ def normalize_text(text: str) -> str:
     letter, so we preserve it explicitly to keep conjuncts intact.
     """
     text = unicodedata.normalize("NFC", text)
-    # Keep: Unicode letters (\w minus _), digits, whitespace, and Indic combining marks
-    # Remove: everything else (punctuation, symbols, underscore)
-    text = re.sub(r"[^\w\s\u093C\u094D\u0900-\u097F]", " ", text, flags=re.UNICODE)
-    # Remove underscore (included in \w but not a letter)
-    text = text.replace("_", " ")
+    # Preserve combining marks across Indic scripts so normalization does not
+    # change Kannada/Tamil words while removing punctuation and symbols.
+    text = "".join(
+        char
+        if char.isspace() or unicodedata.category(char)[0] in {"L", "N", "M"}
+        else " "
+        for char in text
+    )
     text = re.sub(r"\s+", " ", text).strip().lower()
     return text

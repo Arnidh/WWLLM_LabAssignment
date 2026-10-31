@@ -145,6 +145,11 @@ class TestNotesMock:
         result = make_notes(MOCK_TRANSCRIPT, lang="hi")
         assert result["latency_s"] >= 0
 
+    def test_english_notes_match_translated_language(self):
+        result = make_notes(MOCK_TRANSCRIPT, lang="en")
+        assert result["title"] == "Newton's Laws of Motion"
+        assert "## Title" in result["markdown"]
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Quiz / MCQ schema validation
@@ -256,6 +261,12 @@ class TestPipelineMock:
         assert result.success
         assert result.translation is not None
         assert result.translation.translated_text != ""
+        assert result.transcript is not None
+        assert result.transcript.full_text == MOCK_TRANSCRIPT
+        assert result.notes is not None
+        assert result.notes["title"] == "Newton's Laws of Motion"
+        assert result.quiz is not None
+        assert result.quiz.mcqs[0]["question"].startswith("What happens")
 
     def test_pipeline_fails_gracefully_no_audio(self):
         """No audio and no transcript override → graceful failure."""
@@ -322,7 +333,7 @@ class TestPipelineMock:
         assert result.to_dict()["transcript"]["chunks"][0]["end_s"] == 2.0
         assert freed == [True]
 
-    def test_pipeline_reports_nonfatal_translation_error(self, monkeypatch):
+    def test_pipeline_fails_when_translation_fails(self, monkeypatch):
         def fail_translation(*args, **kwargs):
             raise RuntimeError("translation model unavailable")
 
@@ -334,8 +345,11 @@ class TestPipelineMock:
             transcript_override=MOCK_TRANSCRIPT,
         )
 
-        assert result.success
-        assert result.warnings == [
-            "Translation failed (non-fatal): translation model unavailable"
-        ]
+        assert not result.success
+        assert result.error_stage == "translation"
+        assert result.error_message == "translation model unavailable"
+        assert result.transcript is not None
+        assert result.transcript.full_text == MOCK_TRANSCRIPT
+        assert result.notes is None
+        assert result.quiz is None
         assert result.stage_latencies["translation"] >= 0

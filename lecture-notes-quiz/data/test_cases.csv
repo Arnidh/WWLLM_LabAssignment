@@ -1,32 +1,31 @@
-id,audio_file,language,test_type,reference_text,notes
-tc01,data/audio/hindi_clean_01.wav,hi,clean,"नमस्ते आज हम न्यूटन के गति के नियमों के बारे में पढ़ेंगे","[""जड़त्व"", ""F=ma"", ""बल"", ""त्वरण""]"
-tc02,data/audio/hindi_noisy_01.wav,hi,noisy,"न्यूटन का पहला नियम जड़त्व का नियम है","[""जड़त्व"", ""पहला नियम""]"
-tc03,data/audio/hindi_fast_01.wav,hi,fast,"बल द्रव्यमान और त्वरण का गुणनफल होता है","[""बल"", ""द्रव्यमान"", ""त्वरण""]"
-tc04,data/audio/hindi_codemix_01.wav,hi,code_mixed,"आज हम machine learning के concepts पढ़ेंगे जैसे gradient descent और backpropagation","[""machine learning"", ""gradient descent"", ""backpropagation""]"
-tc05,data/audio/hindi_numbers_01.wav,hi,numbers_dates,"सन 1687 में न्यूटन ने Principia Mathematica प्रकाशित की जिसमें 3 नियम दिए","[""1687"", ""Principia"", ""3 नियम""]"
-tc06,data/audio/hindi_short_01.wav,hi,short,"नमस्ते","[""नमस्ते""]"
-tc07,data/audio/hindi_long_01.wav,hi,long,"TODO: long lecture transcript (>10 minutes)","[""TODO""]"
-tc08,data/audio/silent_01.wav,hi,edge_case,,
-tc09,data/audio/non_lecture_01.wav,hi,edge_case,,
-tc10,data/audio/hindi_clean_02.wav,hi,clean,"पृथ्वी सूर्य के चारों ओर घूमती है इस प्रक्रिया में गुरुत्वाकर्षण बल काम करता है","[""पृथ्वी"", ""सूर्य"", ""गुरुत्वाकर्षण""]"
-tc11,data/audio/kannada_clean_01.wav,kn,clean,,
-tc12,data/audio/tamil_clean_01.wav,ta,clean,,
-tc13,data/audio/hindi_codemix_02.wav,hi,code_mixed,"neural network में weights और biases होते हैं","[""neural network"", ""weights"", ""biases""]"
-tc14,data/audio/hindi_numbers_02.wav,hi,numbers_dates,"प्रकाश की गति 3 लाख किलोमीटर प्रति सेकंड है","[""प्रकाश"", ""3 लाख"", ""किलोमीटर""]"
-tc15,data/audio/hindi_clean_03.wav,hi,clean,"ऊर्जा न तो बनाई जा सकती है और न ही नष्ट की जा सकती है","[""ऊर्जा"", ""संरक्षण""]"
-tc16,data/audio/hindi_noisy_02.wav,hi,noisy,,
-tc17,data/audio/hindi_fast_02.wav,hi,fast,,
-tc18,data/audio/hindi_clean_04.wav,hi,clean,,
-tc19,data/audio/hindi_codemix_03.wav,hi,code_mixed,,
-tc20,data/audio/hindi_long_02.wav,hi,long,,
-tc21,data/audio/hindi_clean_05.wav,hi,clean,,
-tc22,data/audio/hindi_numbers_03.wav,hi,numbers_dates,,
-tc23,data/audio/hindi_noisy_03.wav,hi,noisy,,
-tc24,data/audio/hindi_short_02.wav,hi,short,,
-tc25,data/audio/hindi_short_03.wav,hi,short,,
-tc26,data/audio/kannada_clean_02.wav,kn,clean,,
-tc27,data/audio/tamil_clean_02.wav,ta,clean,,
-tc28,data/audio/hindi_clean_06.wav,hi,clean,,
-tc29,data/audio/hindi_fast_03.wav,hi,fast,,
-tc30,data/audio/hindi_codemix_04.wav,hi,code_mixed,,
-
+id,audio_file,language,test_type,reference_text,notes,dataset_id,dataset_config,dataset_split,dataset_revision,dataset_license,source_id,gender
+fleurs_hi_1706,data/audio/fleurs_hi_in_3224677870094884833.wav,hi,read_speech,"ज़्यादा परंपरागत चर्चों में ईस्टर सप्ताहांत में शनिवार रात को ईस्टर विजिल का आयोजन किया जाता है, जिसमें लोग क्रिस के पुनर्जन्म का उत्सव मनाने के लिए आधी रात के समय उत्सव मनाना शुरू करते हैं.",,google/fleurs,hi_in,test,70bb2e84b976b7e960aa89f1c648e09c59f894dd,CC-BY-4.0,1706,MALE
+fleurs_hi_1840,data/audio/fleurs_hi_in_4786756809138902466.wav,hi,read_speech,"इटली के कई अन्य शहरों और दुनिया के बाकी हिस्सों में, खासकर पोलैंड में, इस तरह के सेटअप बनाए गए थे, जिन्हें बड़ी संख्या में लोगों ने देखा था।",,google/fleurs,hi_in,test,70bb2e84b976b7e960aa89f1c648e09c59f894dd,CC-BY-4.0,1840,FEMALE
+fleurs_hi_1666,data/audio/fleurs_hi_in_10107687492910459268.wav,hi,read_speech,"अपनी सरकार के अलावा आप अन्य देशों की सरकारों की सलाह ले सकते हैं. हालाँकि, उनकी सलाह उनके नागरिकों को ध्यान में रखकर दी जाती हैं.",,google/fleurs,hi_in,test,70bb2e84b976b7e960aa89f1c648e09c59f894dd,CC-BY-4.0,1666,FEMALE
+fleurs_hi_1737,data/audio/fleurs_hi_in_9827556117158213708.wav,hi,read_speech,शेर प्राइड नामक बड़े समूहों में रहने वाली सबसे बड़ी सामाजिक बिल्लियाँ हैं.,,google/fleurs,hi_in,test,70bb2e84b976b7e960aa89f1c648e09c59f894dd,CC-BY-4.0,1737,MALE
+fleurs_hi_1847,data/audio/fleurs_hi_in_11099457867420986000.wav,hi,read_speech,उनका सिंगापुर के उप-प्रधान मंत्री वोंग कान सेंग ने स्वागत किया और उन्होंने सिंगापुर के प्रधानमंत्री ली सिएन लूंग के साथ व्यापार और आतंकवाद के मामले पर बातचीत की.,,google/fleurs,hi_in,test,70bb2e84b976b7e960aa89f1c648e09c59f894dd,CC-BY-4.0,1847,FEMALE
+fleurs_hi_1876,data/audio/fleurs_hi_in_7698875201475624229.wav,hi,read_speech,उत्तरी मैरिएनस इमरजेंसी प्रबंधन कार्यलय की ओर से कहा गया कि राष्ट्र में नुकसान की कोई सूचना प्राप्त नहीं हुई थी.,,google/fleurs,hi_in,test,70bb2e84b976b7e960aa89f1c648e09c59f894dd,CC-BY-4.0,1876,FEMALE
+fleurs_hi_1827,data/audio/fleurs_hi_in_12106180364446341165.wav,hi,read_speech,सबसे नज़दीकी सिरे पर क्रस्ट की मोटाई करीब 70 किलोमीटर है और सबसे दूर के सिरे पर यह 100 किलोमीटर है.,,google/fleurs,hi_in,test,70bb2e84b976b7e960aa89f1c648e09c59f894dd,CC-BY-4.0,1827,FEMALE
+fleurs_hi_1885,data/audio/fleurs_hi_in_17349500802477341222.wav,hi,read_speech,"10: 00-11: 00 बजे एमडीटी के बीच, यार्ड में कैदियों द्वारा आग लगा दी गई थी.",,google/fleurs,hi_in,test,70bb2e84b976b7e960aa89f1c648e09c59f894dd,CC-BY-4.0,1885,FEMALE
+fleurs_hi_1845,data/audio/fleurs_hi_in_16123362965198915963.wav,hi,read_speech,महाराजा और महारानी के ख़िलाफ़ चीखते-चिल्लाते लोगों की भीड़ से घिरी एक गाड़ी में सफर करते हुए वे लोग पेरिस वापस आए.,,google/fleurs,hi_in,test,70bb2e84b976b7e960aa89f1c648e09c59f894dd,CC-BY-4.0,1845,MALE
+fleurs_hi_1807,data/audio/fleurs_hi_in_10924000697500767031.wav,hi,read_speech,"इटैलियन भी रोज़ाना इस्तेमाल होने वाली भाषा है जिसे राज्य में काम करने वाले अधिकांश लोग उपयोग में लाते हैं, जबकि लेटिन का धार्मिक रस्मों में इस्तेमाल किया जाता है.",,google/fleurs,hi_in,test,70bb2e84b976b7e960aa89f1c648e09c59f894dd,CC-BY-4.0,1807,MALE
+fleurs_kn_1975,data/audio/fleurs_kn_in_9410492005022246210.wav,kn,read_speech,ವ್ಯಾಟಿಕನ್ ಸಿಟಿಯ ಜನಸಂಖ್ಯೆ ಸುಮಾರು 800ರಷ್ಟಿದೆ. ಅದು ಪ್ರಪಂಚದ ಅತ್ಯಂತ ಚಿಕ್ಕ ಸ್ವತಂತ್ರ ರಾಷ್ಟ್ರವಾಗಿದ್ದು ಪ್ರಪಂಚದ  ಅತ್ಯಂತ ಕಡಿಮೆ ಜನಸಂಖ್ಯೆಯ ರಾಷ್ಟ್ರವೂ ಅದೇ ಆಗಿದೆ.,,google/fleurs,kn_in,test,70bb2e84b976b7e960aa89f1c648e09c59f894dd,CC-BY-4.0,1975,FEMALE
+fleurs_kn_1972,data/audio/fleurs_kn_in_12896743553268648660.wav,kn,read_speech,ಬಹಳಷ್ಟು ಜನರು ಅವುಗಳನ್ನು ಡೈನೋಸಾರ್ ಎಂಬ ದೃಷ್ಟಿಯಿಂದ  ನೋಡುವುದಿಲ್ಲ. ಏಕೆಂದರೆ ಅವು ರೆಕ್ಕೆ ಪುಕ್ಕ ಹೊಂದಿವೆ ಮತ್ತು ಹಾರಬಲ್ಲವು.,,google/fleurs,kn_in,test,70bb2e84b976b7e960aa89f1c648e09c59f894dd,CC-BY-4.0,1972,FEMALE
+fleurs_kn_1997,data/audio/fleurs_kn_in_6139957253458997629.wav,kn,read_speech,"ಅದ್ಯಾಗೂ,  ಕ್ಷಯರೋಗ ಹೂಂದಿದ್ದ ಆ ಇಡೀ ಗುಂಪಿನ ಜನರಲ್ಲಿನ  XDR-TBಯ ಶೇಕಡಾವಾರು ಪ್ರಮಾಣ ಇನ್ನೂ ಬಹಳ ಕಡಿಮೆ ಇರುವಂತಿದೆ;  ಒಂದು ನಿರ್ದಿಷ್ಟ ಅವಧಿಯಲ್ಲಿ, ದಕ್ಷಿಣ ಆಫ್ರಿಕಾದಲ್ಲಿ  ಒಟ್ಟು 330,000 ಜನರಲ್ಲಿ 6000 ಜನರು   ಸೋಂಕಿತರಾಗಿರುತ್ತಾರೆ.",,google/fleurs,kn_in,test,70bb2e84b976b7e960aa89f1c648e09c59f894dd,CC-BY-4.0,1997,MALE
+fleurs_kn_1749,data/audio/fleurs_kn_in_11847861750644505566.wav,kn,read_speech,"ಇದು ""ವಿಚ್ಚಿ"" ಫ್ರೆಂಚ್‌ರ ಆಳ್ವಿಕೆಗೊಳಪಟ್ಟಿತ್ತು. ಇವರು 1940ರಲ್ಲಿ ಜರ್ಮನ್ನರೊಡನೆ ಶಾಂತಿ ಸಂಧಾನ ಮಾಡಿಕೊಂಡಿದ್ದ ಫ್ರೆಂಚರಾಗಿದ್ದು, ದಾಳಿಕೋರರೊಡನೆ ಹೊಡೆದಾಡುವ ಬದಲು ಅವರೊಂದಿಗೆ ವ್ಯವಹರಿಸಿಕೊಂಡಿದ್ದರು.",,google/fleurs,kn_in,test,70bb2e84b976b7e960aa89f1c648e09c59f894dd,CC-BY-4.0,1749,FEMALE
+fleurs_kn_1815,data/audio/fleurs_kn_in_14043327156273837295.wav,kn,read_speech,ವಿದಳನ ಬಾಂಬ್ ಅನೇಕ ಪ್ರೋಟಾನ್‌ಗಳು ಮತ್ತು ನ್ಯೂಟ್ರಾನ್‌ಗಳೊಂದಿಗೆ ನ್ಯೂಕ್ಲಿಯಸ್ ಅನ್ನು ಒಟ್ಟುಗೂಡಿಸಲು ಶಕ್ತಿಯನ್ನು ತೆಗೆದುಕೊಳ್ಳುತ್ತದೆ ಎಂಬ ತತ್ವದ ಮೇಲೆ  ಕೆಲಸ ಮಾಡುತ್ತದೆ.,,google/fleurs,kn_in,test,70bb2e84b976b7e960aa89f1c648e09c59f894dd,CC-BY-4.0,1815,MALE
+fleurs_kn_1870,data/audio/fleurs_kn_in_5085666561922878519.wav,kn,read_speech,ಪಿರಮಿಡ್‌ಗಳ ಮೇಲೆ ಸನ್ನಿವೇಶಗಳನ್ನು ಪ್ರದರ್ಶಿಸಲಾಗಿದೆ ಮತ್ತು ವಿಭಿನ್ನ ಪಿರಮಿಡ್‌ಗಳನ್ನು ಬೆಳಗುವಂತೆ ಮಾಡಾಲಾಗಿದೆ.,,google/fleurs,kn_in,test,70bb2e84b976b7e960aa89f1c648e09c59f894dd,CC-BY-4.0,1870,FEMALE
+fleurs_kn_1969,data/audio/fleurs_kn_in_517857233753806174.wav,kn,read_speech,"ಅದರ ಪ್ರಕಾರ ಒಂದು ಚಿತ್ರದ ಮುಖ್ಯ ವಿಷಯದ ಅತ್ಯಂತ ಪರಿಣಾಮಕಾರಿ ಜಾಗ, ಆ ಚಿತ್ರವನ್ನು ಉದ್ದ ಮತ್ತು ಅಡ್ಡವಾಗಿ ಮೂರು ಭಾಗಗಳನ್ನಾಗಿ ವಿಭಾಗಿಸಿದಾಗ ಮೂಡುವ ರೇಖೆಗಳ ಪರಸ್ಪರ ಹಾಯುವಿಕೆಯ ಜಾಗವಾಗಿದೆ.",,google/fleurs,kn_in,test,70bb2e84b976b7e960aa89f1c648e09c59f894dd,CC-BY-4.0,1969,FEMALE
+fleurs_kn_1732,data/audio/fleurs_kn_in_5604690091109738979.wav,kn,read_speech,"ಘಟನೆಗಳು ನಡೆದ ಯುಗವನ್ನು ಸಾಮಾನ್ಯವಾಗಿ 11, 12 ಮತ್ತು 13ನೇ ಶತಮಾನಗಳಲ್ಲಿ (ಕ್ರಿ.ಶ. 1000–1300) ಯುರೋಪಿಯನ್ ಇತಿಹಾಸದ ಅವಧಿಯ ಅಧಿಕ ಮಧ್ಯಯುಗ ಎಂದು ಕರೆಯಲಾಗುತ್ತದೆ.",,google/fleurs,kn_in,test,70bb2e84b976b7e960aa89f1c648e09c59f894dd,CC-BY-4.0,1732,FEMALE
+fleurs_kn_1925,data/audio/fleurs_kn_in_12641068212978048998.wav,kn,read_speech,"ಮಾಡಿದ ಕೆಲಸವು ತಕ್ಕಮಟ್ಟಿಗೆ ಸೈದ್ಧಾಂತಿಕವಾಗಿತ್ತು, ಆದರೆ ಸಾಗಿಟ್ಟಾರಿಯಾಸ್ ನಕ್ಷತ್ರಪುಂಜದ ಅವಲೋಕನಗಳನ್ನು ಅನುಕರಿಸಲು ಈ ಪ್ರೋಗ್ರಾಂ ಬರೆಯಲಾಗಿದೆ.",,google/fleurs,kn_in,test,70bb2e84b976b7e960aa89f1c648e09c59f894dd,CC-BY-4.0,1925,FEMALE
+fleurs_kn_1898,data/audio/fleurs_kn_in_8484559004291024228.wav,kn,read_speech,"""ಅವನು [ವೇಲ್ಸ್] ಮೊದಲಿನಿಂದಲೂ ನಮಗೆ ಸುಳ್ಳು ಹೇಳಿದನು. ಮೊದಲನೆಯದಾಗಿ, ಇದು ಕಾನೂನು ಕಾರಣಗಳಿಗಾಗಿ ನಟಿಸುವ ಮೂಲಕ. ಎರಡನೆಯದಾಗಿ, ಅವನು ನಮ್ಮ ಮಾತುಗಳನ್ನು ಕೇಳುತ್ತಿದ್ದಾನೆ ಎಂದು ನಟಿಸುವ ಮೂಲಕ, ಅದೂ ಅವನ ಕಲಾಕೃತಿಯನ್ನು ಅಳಿಸುವವರೆಗೂ.""",,google/fleurs,kn_in,test,70bb2e84b976b7e960aa89f1c648e09c59f894dd,CC-BY-4.0,1898,FEMALE
+fleurs_ta_1867,data/audio/fleurs_ta_in_11673401771200146144.wav,ta,read_speech,"தாவரங்கள் மனிதர்கள் சுவாசிக்கும் ஆக்ஸிஜனை உருவாக்குகின்றன, மேலும் அவை மனிதர்கள் சுவாசித்து வெளியேற்றும் (அதாவது வெளிவிடும்) கார்பன்-டை-ஆக்சைடை எடுத்துக்கொள்கின்றன.",,google/fleurs,ta_in,test,70bb2e84b976b7e960aa89f1c648e09c59f894dd,CC-BY-4.0,1867,FEMALE
+fleurs_ta_1804,data/audio/fleurs_ta_in_14443944745083116029.wav,ta,read_speech,"நீதி மற்றும் குடியுரிமைக்கான ஹைடியன் நிறுவனம், நேபாளிய ஐக்கிய நாட்டு அமைதிப்படை அறியாமலே ஹைடியிற்கு நோயைக் கொண்டு வந்ததைக் குறிப்பிடும் தனிப்பட்ட ஆராய்ச்சியை மேற்கோள் காட்டியுள்ளது.",,google/fleurs,ta_in,test,70bb2e84b976b7e960aa89f1c648e09c59f894dd,CC-BY-4.0,1804,MALE
+fleurs_ta_1976,data/audio/fleurs_ta_in_14996689263853124442.wav,ta,read_speech,"மிடில் ஆர்டர் பேட்ஸ்மேன்களான சச்சின் டெண்டுல்கர், ராகுல் டிராவிட் ஆகியோர் சிறப்பாக செயல்பட்டு கூட்டாக நூறு ரன்கள் எடுத்தனர்.",,google/fleurs,ta_in,test,70bb2e84b976b7e960aa89f1c648e09c59f894dd,CC-BY-4.0,1976,MALE
+fleurs_ta_2005,data/audio/fleurs_ta_in_11744153157513623842.wav,ta,read_speech,"ஆனால், பறவைகளில் டைனோசரைப் போல தோற்றமளிக்கும் பல விஷயங்கள் இன்னமும் இருக்கின்றன.",,google/fleurs,ta_in,test,70bb2e84b976b7e960aa89f1c648e09c59f894dd,CC-BY-4.0,2005,FEMALE
+fleurs_ta_1829,data/audio/fleurs_ta_in_7233318788544307559.wav,ta,read_speech,மிக அதிக வரியுடைய நாடுகளுக்குச் செல்லும் பயணிகள் சில சமயங்களில் முக்கியமாக மதுபானங்கள் மற்றும் புகையிலையில் குறிப்பிடத்தக்க அளவு பணத்தை சேமிக்கலாம்.,,google/fleurs,ta_in,test,70bb2e84b976b7e960aa89f1c648e09c59f894dd,CC-BY-4.0,1829,FEMALE
+fleurs_ta_1894,data/audio/fleurs_ta_in_1286226306355676414.wav,ta,read_speech,"கறி என்பது இறைச்சி அல்லது காய்கறிகளுடன், மூலிகைகள் மற்றும் மசாலாப் பொருட்களை அடிப்படையாகக் கொண்ட ஒரு உணவாகும்.",,google/fleurs,ta_in,test,70bb2e84b976b7e960aa89f1c648e09c59f894dd,CC-BY-4.0,1894,FEMALE
+fleurs_ta_1811,data/audio/fleurs_ta_in_9086037953312299267.wav,ta,read_speech,802.11n தரம் 2.4Ghz மற்றும் 5.0Ghz அலைவரிசை ஆகிய இரண்டிலும் செயல்படும்.,,google/fleurs,ta_in,test,70bb2e84b976b7e960aa89f1c648e09c59f894dd,CC-BY-4.0,1811,FEMALE
+fleurs_ta_1948,data/audio/fleurs_ta_in_17650603354385172207.wav,ta,read_speech,"மூன்று அரசாங்கங்கள் என்பது பழங்கால சீன வரலாற்றில் ஒரு ரத்த களரியான காலம், ஆயிரக் கணக்கான மக்கள் சியானிலிருந்த பெரிய அரண்மனையின் உயர்ந்த பதவியில் அமர, சண்டையிட்டுக் கொண்டு இறந்தனர்.",,google/fleurs,ta_in,test,70bb2e84b976b7e960aa89f1c648e09c59f894dd,CC-BY-4.0,1948,FEMALE
+fleurs_ta_1841,data/audio/fleurs_ta_in_10514693308136502515.wav,ta,read_speech,"மேலே தெளிவான, அழகான வானம் மற்றும் பல மலைகளால் சூழப்பட்டுள்ளதைத் தவிர வேறு எதையும் காண இயலாது. குகைக்குள் இருந்து மிகக் குறைந்த அளவே உலகினைக் காணவோ அல்லது கேட்கவோ முடியும்.",,google/fleurs,ta_in,test,70bb2e84b976b7e960aa89f1c648e09c59f894dd,CC-BY-4.0,1841,FEMALE
+fleurs_ta_1958,data/audio/fleurs_ta_in_240132210819960447.wav,ta,read_speech,"அந்த நகரம், நாட்டின் மற்ற நகரங்களிலிருந்து முற்றிலும் மாறுபட்டது, ஏனெனில் அது ஆப்பிரிக்க சுவையன்றி அராபியச் சுவை கொண்டிருக்கிறது.",,google/fleurs,ta_in,test,70bb2e84b976b7e960aa89f1c648e09c59f894dd,CC-BY-4.0,1958,MALE

@@ -6,9 +6,9 @@ Gradio frontend for the Multilingual Lecture-to-Notes & Quiz Generator.
 Tabs
 ----
 1. Transcript   – full ASR output with per-chunk view
-2. Notes        – Markdown structured notes
-3. Quiz         – interactive MCQ view (select → reveal)
-4. Translated   – optional IndicTrans2 translation of notes
+2. Translation  – transcript translated into the selected language
+3. Notes        – Markdown notes in the selected language
+4. Quiz         – interactive MCQs in the selected language
 
 Run
 ---
@@ -38,6 +38,7 @@ _ROOT = Path(__file__).parent
 sys.path.insert(0, str(_ROOT))
 
 from src.pipeline import run_pipeline
+from src.pdf_export import save_notes_pdf, save_quiz_pdf
 from src.utils import get_logger, is_mock_mode, load_config
 
 logger = get_logger("app")
@@ -62,6 +63,7 @@ TRANS_CHOICES = [("(No translation)", "")] + [
 ]
 
 DEFAULT_LANG = cfg.get("default_language", "hi")
+DEFAULT_TRANSLATION = cfg.get("default_translation_language", "en")
 
 # ── Timing banner helper ──────────────────────────────────────────────────────
 
@@ -84,9 +86,9 @@ def _timing_html(timings: dict[str, float], total: float) -> str:
 # ── Quiz HTML renderer ────────────────────────────────────────────────────────
 
 def _render_quiz_html(mcqs: list[dict]) -> str:
-    """Render MCQs as an interactive HTML widget with reveal-on-click."""
+    """Render MCQs with a native, keyboard-accessible answer reveal."""
     if not mcqs:
-        return "<p style='color:gray'>No questions generated.</p>"
+        return "<p style='color:#4b5563'>No questions generated.</p>"
 
     items_html = []
     for i, q in enumerate(mcqs):
@@ -102,52 +104,40 @@ def _render_quiz_html(mcqs: list[dict]) -> str:
             safe_letter = html.escape(str(letter), quote=True)
             safe_text = html.escape(str(text))
             opts_html += (
-                f"<label style='display:block;margin:4px 0;cursor:pointer'>"
-                f"<input type='radio' name='q{qn}' value='{safe_letter}' "
-                f"onclick=\"revealAnswer({qn}, '{answer}', this)\">"
-                f" <b>{safe_letter}.</b> {safe_text}"
-                f"</label>"
+                "<label style='display:block;margin:4px 0;cursor:pointer;"
+                "color:#1f2937'>"
+                f"<input type='radio' name='q{qn}' value='{safe_letter}'>"
+                f" <b style='color:#111827 !important'>{safe_letter}.</b> "
+                f"<span style='color:#1f2937 !important'>{safe_text}</span></label>"
             )
 
         items_html.append(f"""
 <div id="q{qn}" style="
   border:1px solid #ddd; border-radius:8px; padding:14px 18px;
-  margin-bottom:16px; background:#fafafa">
-  <p style="font-weight:600;margin:0 0 8px 0">Q{qn}. {question}</p>
+  margin-bottom:16px; background:#fff; color:#1f2937">
+  <p style="font-weight:600;margin:0 0 8px 0;color:#111827">Q{qn}. {question}</p>
   {opts_html}
-  <div id="reveal{qn}" style="display:none;margin-top:10px;
-    padding:8px 12px;border-radius:6px;background:#e8f5e9;border-left:4px solid #4caf50">
-    <b>✔ Correct Answer: {answer}</b><br>
-    <span style="font-size:0.9em">{explanation}</span><br>
-    <span style="font-size:0.8em;color:#555;margin-top:4px;display:block">
-      📖 Evidence: <i>{evidence}</i>
-    </span>
-  </div>
+  <details style="margin-top:10px">
+    <summary style="cursor:pointer;color:#1f2937;font-weight:600">
+      Show answer and explanation
+    </summary>
+    <div style="margin-top:8px;padding:8px 12px;border-radius:6px;
+      background:#e8f5e9;border-left:4px solid #4caf50;color:#1f2937">
+      <b style="color:#111827 !important">✔ Correct Answer: {answer}</b><br>
+      <span style="font-size:0.9em;color:#1f2937 !important">{explanation}</span><br>
+      <span style="font-size:0.8em;color:#374151 !important;margin-top:4px;display:block">
+        📖 Evidence: <i style="color:#374151 !important">{evidence}</i>
+      </span>
+    </div>
+  </details>
 </div>
 """)
 
-    script = """
-<script>
-function revealAnswer(qn, correct, radioElem) {
-  var div = document.getElementById("reveal" + qn);
-  div.style.display = "block";
-  var selected = radioElem.value;
-  // Highlight correct / wrong
-  var radios = document.querySelectorAll("input[name='q" + qn + "']");
-  radios.forEach(function(r) {
-    var lbl = r.parentElement;
-    if (r.value === correct) {
-      lbl.style.color = "#2e7d32";
-      lbl.style.fontWeight = "bold";
-    } else if (r.value === selected && selected !== correct) {
-      lbl.style.color = "#c62828";
-    }
-    r.disabled = true;
-  });
-}
-</script>
-"""
-    return "<div style='max-width:700px'>" + "".join(items_html) + script + "</div>"
+    return (
+        "<div style='max-width:700px;background:#fff;color:#1f2937'>"
+        + "".join(items_html)
+        + "</div>"
+    )
 
 
 # ── Download helpers ──────────────────────────────────────────────────────────
@@ -181,9 +171,10 @@ def generate(
     progress=gr.Progress(track_tqdm=True),
 ) -> tuple:
     """
-    Main Gradio callback. Returns a 9-tuple:
+    Main Gradio callback. Returns an 11-tuple:
       (status_html, transcript_text, chunks_text, notes_md,
-       quiz_html, translated_notes, timing_html, notes_file, quiz_file)
+       quiz_html, translated_transcript, timing_html, notes_file, notes_pdf,
+       quiz_file, quiz_pdf)
     """
     mock_banner = (
         "<span style='background:#fff3cd;padding:2px 8px;border-radius:4px;"
@@ -194,7 +185,7 @@ def generate(
     if audio_input is None:
         err = "❌ Please upload an audio file or record via microphone."
         return (
-            err, "", "", "", "<p>–</p>", "", "", None, None
+            err, "", "", "", "<p>–</p>", "", "", None, None, None, None
         )
 
     try:
@@ -210,7 +201,7 @@ def generate(
         logger.exception("Pipeline crashed")
         return (
             f"❌ Unexpected error: {html.escape(str(exc))}",
-            "", "", "", "<p>–</p>", "", "", None, None,
+            "", "", "", "<p>–</p>", "", "", None, None, None, None,
         )
 
     d = result.to_dict()
@@ -231,6 +222,7 @@ def generate(
     mr_note = ""
     if d["notes"].get("used_map_reduce"):
         mr_note = "\n\n> ℹ️ *Map-reduce was used (transcript was long).*"
+    notes_pdf_file = save_notes_pdf(notes_md + mr_note) if notes_md else None
 
     # ── Quiz ──────────────────────────────────────────────────────────────
     mcqs = d["quiz"]["mcqs"]
@@ -240,6 +232,7 @@ def generate(
         warn_str = "\n".join(f"⚠ {w}" for w in quiz_warnings)
         quiz_html += f"<pre style='color:#856404;background:#fff3cd;padding:8px'>{warn_str}</pre>"
     quiz_file = _save_quiz(mcqs) if mcqs else None
+    quiz_pdf_file = save_quiz_pdf(mcqs) if mcqs else None
 
     # ── Translation ───────────────────────────────────────────────────────
     translated_text: str = d["translation"]["text"]
@@ -267,7 +260,9 @@ def generate(
         translated_text,
         timing_html,
         notes_file,
+        notes_pdf_file,
         quiz_file,
+        quiz_pdf_file,
     )
 
 
@@ -312,8 +307,8 @@ def build_ui() -> gr.Blocks:
 
                 trans_dd = gr.Dropdown(
                     choices=TRANS_CHOICES,
-                    value="",
-                    label="🔄 Translate notes to (optional)",
+                    value=DEFAULT_TRANSLATION,
+                    label="🔄 Translate transcript and generate notes/quiz in",
                 )
 
                 generate_btn = gr.Button(
@@ -344,10 +339,21 @@ def build_ui() -> gr.Blocks:
                             )
                         timing_box = gr.HTML(label="⏱ Per-stage latency")
 
+                    with gr.Tab("🌍 Translation"):
+                        translated_box = gr.Textbox(
+                            label="Translated transcript",
+                            lines=8,
+                            show_copy_button=True,
+                        )
+
                     with gr.Tab("📚 Notes"):
                         notes_box = gr.Markdown(label="Structured Notes")
                         notes_dl = gr.File(
                             label="⬇ Download notes (.md)",
+                            visible=True,
+                        )
+                        notes_pdf_dl = gr.File(
+                            label="⬇ Download notes (.pdf)",
                             visible=True,
                         )
 
@@ -357,9 +363,10 @@ def build_ui() -> gr.Blocks:
                             label="⬇ Download quiz (.json)",
                             visible=True,
                         )
-
-                    with gr.Tab("🌍 Translated Notes"):
-                        translated_box = gr.Markdown(label="Translated Notes")
+                        quiz_pdf_dl = gr.File(
+                            label="⬇ Download quiz (.pdf)",
+                            visible=True,
+                        )
 
         # ── Wire up ───────────────────────────────────────────────────────
         generate_btn.click(
@@ -374,7 +381,9 @@ def build_ui() -> gr.Blocks:
                 translated_box,
                 timing_box,
                 notes_dl,
+                notes_pdf_dl,
                 quiz_dl,
+                quiz_pdf_dl,
             ],
             show_progress="full",
         )

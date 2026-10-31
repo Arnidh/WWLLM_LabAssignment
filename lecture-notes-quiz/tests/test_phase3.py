@@ -239,3 +239,58 @@ def test_pipeline_passes_transcript_for_evidence_and_frees_model(monkeypatch):
     assert captured["source"] is notes
     assert captured["transcript"] == transcript
     assert freed == [True]
+
+
+def test_pipeline_translates_before_generating_notes_and_quiz(monkeypatch):
+    from src.translate import TranslationResult
+
+    calls: list[tuple[str, str]] = []
+    original = "Original-language transcript."
+    translated = "Translated transcript."
+    notes = {
+        "title": "Lecture",
+        "key_points": ["point"],
+        "key_terms": [],
+        "summary": "summary",
+        "missing_information": [],
+        "markdown": "## Lecture",
+        "latency_s": 0.1,
+        "used_map_reduce": False,
+    }
+
+    def translate_text(text: str, src_lang: str, tgt_lang: str) -> TranslationResult:
+        calls.append(("translate", text))
+        assert src_lang == "hi"
+        assert tgt_lang == "en"
+        return TranslationResult(translated, src_lang, tgt_lang, 0.1)
+
+    def make_notes(text: str, lang: str) -> dict:
+        calls.append(("notes", text))
+        assert lang == "en"
+        return notes
+
+    def make_quiz(source: object, **kwargs: object) -> QuizResult:
+        calls.append(("quiz", str(kwargs["transcript"])))
+        assert kwargs["lang"] == "en"
+        assert kwargs["transcript"] == translated
+        return QuizResult([], "[]", 1, 0.1)
+
+    monkeypatch.setattr(pipeline_module, "translate", translate_text)
+    monkeypatch.setattr(pipeline_module, "make_notes", make_notes)
+    monkeypatch.setattr(pipeline_module, "make_mcqs", make_quiz)
+    monkeypatch.setattr(pipeline_module, "free_llm_memory", lambda: None)
+    result = pipeline_module.run_pipeline(
+        audio_path=None,
+        lang="hi",
+        translate_to="en",
+        transcript_override=original,
+    )
+
+    assert result.success
+    assert result.transcript is not None
+    assert result.transcript.full_text == original
+    assert calls == [
+        ("translate", original),
+        ("notes", translated),
+        ("quiz", translated),
+    ]

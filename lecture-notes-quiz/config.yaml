@@ -5,6 +5,7 @@
 
 # ── Language settings ─────────────────────────
 default_language: "hi"          # BCP-47 code used at startup (Hindi)
+default_translation_language: "en"
 # Add more codes as you onboard models:
 supported_languages:
   hi: "Hindi"

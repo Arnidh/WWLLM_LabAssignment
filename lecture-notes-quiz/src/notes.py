@@ -64,6 +64,28 @@ MOCK_NOTES_DATA: dict[str, Any] = {
     "missing_information": [],
 }
 
+MOCK_NOTES_DATA_EN: dict[str, Any] = {
+    "title": "Newton's Laws of Motion",
+    "key_points": [
+        "Newton's first law is also called the law of inertia.",
+        "An object remains at rest unless an external force acts on it.",
+        "Newton's second law states that force equals mass times acceleration.",
+        "Newton's third law describes equal and opposite reactions.",
+        "The laws apply to rocket science, vehicle design, and sports.",
+    ],
+    "key_terms": [
+        {"term": "Force", "definition": "An influence that changes an object's motion or shape."},
+        {"term": "Mass", "definition": "The amount of matter in an object."},
+        {"term": "Acceleration", "definition": "The rate of change of velocity."},
+        {"term": "Inertia", "definition": "An object's tendency to maintain its state of motion."},
+    ],
+    "summary": (
+        "The lecture explains Newton's three laws of motion and their "
+        "applications in rocket science, vehicle design, and sports."
+    ),
+    "missing_information": [],
+}
+
 
 class KeyTerm(BaseModel):
     model_config = ConfigDict(extra="forbid")
@@ -397,9 +419,10 @@ def make_notes(transcript: str, lang: str = "hi") -> dict[str, Any]:
     if not transcript.strip():
         raise ValueError("Cannot create notes from an empty transcript.")
     if is_mock_mode():
-        result = dict(MOCK_NOTES_DATA)
-        result["key_points"] = list(MOCK_NOTES_DATA["key_points"])
-        result["key_terms"] = [dict(term) for term in MOCK_NOTES_DATA["key_terms"]]
+        mock_data = MOCK_NOTES_DATA_EN if lang == "en" else MOCK_NOTES_DATA
+        result = dict(mock_data)
+        result["key_points"] = list(mock_data["key_points"])
+        result["key_terms"] = [dict(term) for term in mock_data["key_terms"]]
         result.update(
             markdown=notes_to_markdown(result),
             latency_s=0.01,

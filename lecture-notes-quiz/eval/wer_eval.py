@@ -20,8 +20,8 @@ from __future__ import annotations
 import argparse
 import csv
 import json
-import os
 import sys
+from collections import defaultdict
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -34,7 +34,7 @@ logger = get_logger("wer_eval")
 def compute_wer_cer(
     reference: str,
     hypothesis: str,
-) -> dict[str, float]:
+) -> dict[str, float | int | str]:
     """
     Compute WER and CER after normalisation.
 
@@ -84,6 +84,11 @@ def run_wer_eval(
     Transcripts are read from `transcripts_dir/<id>.txt`.
     """
     rows = []
+    missing_hypotheses: list[str] = []
+    normalized_references: list[str] = []
+    normalized_hypotheses: list[str] = []
+    references_by_language: dict[str, list[str]] = defaultdict(list)
+    hypotheses_by_language: dict[str, list[str]] = defaultdict(list)
     with open(test_cases_csv, newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         for row in reader:
@@ -92,17 +97,24 @@ def run_wer_eval(
             row_id = row["id"]
             hyp_path = Path(transcripts_dir) / f"{row_id}.txt"
             if not hyp_path.exists():
-                logger.warning("Hypothesis file not found: %s (skipping)", hyp_path)
+                missing_hypotheses.append(row_id)
                 continue
 
             hyp = hyp_path.read_text(encoding="utf-8")
             ref = row["reference_text"]
             metrics = compute_wer_cer(ref, hyp)
+            ref_norm = normalize_text(ref)
+            hyp_norm = normalize_text(hyp)
+            normalized_references.append(ref_norm)
+            normalized_hypotheses.append(hyp_norm)
+            language = row.get("language", "")
+            references_by_language[language].append(ref_norm)
+            hypotheses_by_language[language].append(hyp_norm)
 
             rows.append(
                 {
                     "id": row_id,
-                    "language": row.get("language", ""),
+                    "language": language,
                     "test_type": row.get("test_type", ""),
                     **metrics,
                 }
@@ -114,9 +126,17 @@ def run_wer_eval(
                 metrics["cer"] * 100,
             )
 
+    if missing_hypotheses:
+        raise FileNotFoundError(
+            f"Missing ASR hypotheses for {len(missing_hypotheses)} referenced "
+            f"sample(s): {', '.join(missing_hypotheses[:10])}. "
+            "Run eval/run_asr_inference.py before evaluating."
+        )
     if not rows:
-        logger.warning("No rows evaluated. Check that reference_text is filled in.")
-        return
+        raise ValueError(
+            "No referenced samples were evaluated. Check that reference_text "
+            "is filled in."
+        )
 
     # Write CSV
     Path(output_csv).parent.mkdir(parents=True, exist_ok=True)
@@ -126,16 +146,41 @@ def run_wer_eval(
         writer.writeheader()
         writer.writerows(rows)
 
-    # Summary
-    avg_wer = sum(r["wer"] for r in rows) / len(rows)
-    avg_cer = sum(r["cer"] for r in rows) / len(rows)
-    logger.info(
-        "WER Evaluation complete: %d samples | avg WER=%.1f%% | avg CER=%.1f%%",
-        len(rows),
-        avg_wer * 100,
-        avg_cer * 100,
+    # Corpus rates aggregate word/character errors across the utterances.
+    import jiwer
+
+    def rates(references: list[str], hypotheses: list[str]) -> dict[str, float]:
+        return {
+            "wer": round(jiwer.wer(references, hypotheses), 4),
+            "cer": round(jiwer.cer(references, hypotheses), 4),
+        }
+
+    summary = {
+        "sample_count": len(rows),
+        "overall": rates(
+            normalized_references,
+            normalized_hypotheses,
+        ),
+        "by_language": {
+            language: {
+                "sample_count": len(references),
+                **rates(references, hypotheses_by_language[language]),
+            }
+            for language, references in sorted(references_by_language.items())
+        },
+    }
+    summary_path = Path(output_csv).with_name("wer_summary.json")
+    summary_path.write_text(
+        json.dumps(summary, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
     )
-    print(f"\nResults written to {output_csv}")
+    logger.info(
+        "WER Evaluation complete: %d samples | corpus WER=%.1f%% | corpus CER=%.1f%%",
+        summary["sample_count"],
+        summary["overall"]["wer"] * 100,
+        summary["overall"]["cer"] * 100,
+    )
+    print(f"\nResults written to {output_csv} and {summary_path}")
 
 
 if __name__ == "__main__":
@@ -145,4 +190,3 @@ if __name__ == "__main__":
     parser.add_argument("--output-csv", default="results/wer_results.csv")
     args = parser.parse_args()
     run_wer_eval(args.test_cases, args.transcripts_dir, args.output_csv)
-

@@ -29,6 +29,7 @@ sacremoses>=0.1.1
 
 # Gradio frontend
 gradio>=4.26.0,<6.0
+reportlab>=4.2,<5.0
 
 # Evaluation
 jiwer>=3.0.4                  # WER / CER

@@ -58,26 +58,13 @@ def _to_flores(lang: str) -> str:
 
 # ── MOCK canned output ────────────────────────────────────────────────────────
 
-MOCK_TRANSLATION = """\
-## Title
-Newton's Laws of Motion
-
-## Key Points
-- Newton's First Law (Law of Inertia): An object does not change its state unless an external force is applied.
-- Newton's Second Law: Force = Mass × Acceleration (F = ma).
-- Newton's Third Law: Every action has an equal and opposite reaction.
-- These laws are used in rocket science.
-- They also apply to vehicle design and sports.
-
-## Key Terms
-- **Force**: The influence that changes the motion or shape of an object.
-- **Mass**: The amount of matter in an object.
-- **Acceleration**: The rate of change of velocity.
-- **Inertia**: The tendency of an object to maintain its state.
-
-## Summary
-This lecture explained all three of Newton's laws of motion. The first law is about inertia, the second is F=ma, and the third is about action-reaction. These laws have practical applications in rocket science, vehicles, and sports.
-"""
+MOCK_TRANSLATION = (
+    "Newton's first law states that an object remains at rest unless an external "
+    "force acts on it. Newton's second law states that force equals mass times "
+    "acceleration. Newton's third law states that every action has an equal and "
+    "opposite reaction. These laws are used in rocket science. They also apply "
+    "to vehicle design and sports."
+)
 
 # ── Model state ───────────────────────────────────────────────────────────────
 
@@ -205,7 +192,7 @@ def translate(text: str, src_lang: str, tgt_lang: str) -> TranslationResult:
     Parameters
     ----------
     text : str
-        Input text (notes or transcript).
+    Input text, usually a lecture transcript.
     src_lang : str
         BCP-47 source language code (e.g., "hi").
     tgt_lang : str

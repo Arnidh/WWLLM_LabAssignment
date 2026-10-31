@@ -110,7 +110,8 @@ def run_pipeline(
     lang : str
         BCP-47 source language code.
     translate_to : str or None
-        If provided, translate notes into this BCP-47 target language.
+        If provided, translate the transcript and generate notes and quiz in
+        this BCP-47 target language.
     transcript_override : str or None
         Skip ASR and use this string as the transcript directly (useful for testing).
 
@@ -172,29 +173,49 @@ def run_pipeline(
     report_progress("ASR complete", 0.35)
 
     transcript_text = result.transcript.full_text
+    content_text = transcript_text
+    content_lang = lang
 
-    try:
-        # ── Stage 2: Notes ────────────────────────────────────────────────
-        report_progress("Notes generation", 0.35)
+    # ── Stage 2: Transcript translation (optional) ────────────────────────
+    if translate_to:
+        report_progress("Transcript translation", 0.35)
         stage_start = time.perf_counter()
         try:
-            logger.info("=== Stage 2: Notes generation ===")
-            result.notes = make_notes(transcript_text, lang=lang)
+            logger.info("=== Stage 2: Translation (%s → %s) ===", lang, translate_to)
+            result.translation = translate(
+                transcript_text, src_lang=lang, tgt_lang=translate_to
+            )
+            result.stage_latencies["translation"] = result.translation.latency_s
+            content_text = result.translation.translated_text
+            content_lang = translate_to
+        except Exception as exc:
+            logger.error("Transcript translation failed: %s", exc)
+            result.stage_latencies["translation"] = time.perf_counter() - stage_start
+            return fail("translation", str(exc))
+    report_progress("Translation complete", 0.5)
+
+    try:
+        # ── Stage 3: Notes ────────────────────────────────────────────────
+        report_progress("Notes generation", 0.5)
+        stage_start = time.perf_counter()
+        try:
+            logger.info("=== Stage 3: Notes generation ===")
+            result.notes = make_notes(content_text, lang=content_lang)
             result.stage_latencies["notes"] = result.notes["latency_s"]
         except Exception as exc:
             logger.error("Notes generation failed: %s", exc)
             result.stage_latencies["notes"] = time.perf_counter() - stage_start
             return fail("notes", str(exc))
 
-        # ── Stage 3: MCQ generation ───────────────────────────────────────
-        report_progress("MCQ generation", 0.6)
+        # ── Stage 4: MCQ generation ───────────────────────────────────────
+        report_progress("MCQ generation", 0.75)
         stage_start = time.perf_counter()
         try:
-            logger.info("=== Stage 3: MCQ generation ===")
+            logger.info("=== Stage 4: MCQ generation ===")
             result.quiz = make_mcqs(
                 result.notes,
-                lang=lang,
-                transcript=transcript_text,
+                lang=content_lang,
+                transcript=content_text,
             )
             result.stage_latencies["quiz"] = result.quiz.latency_s
         except Exception as exc:
@@ -204,22 +225,7 @@ def run_pipeline(
     finally:
         free_llm_memory()
 
-    report_progress("Quiz complete", 0.85)
-
-    # ── Stage 4: Translation (optional) ───────────────────────────────────
-    if translate_to and translate_to != lang:
-        report_progress("Translation", 0.85)
-        stage_start = time.perf_counter()
-        try:
-            logger.info("=== Stage 4: Translation (%s → %s) ===", lang, translate_to)
-            result.translation = translate(
-                result.notes["markdown"], src_lang=lang, tgt_lang=translate_to
-            )
-            result.stage_latencies["translation"] = result.translation.latency_s
-        except Exception as exc:
-            logger.error("Translation failed (non-fatal): %s", exc)
-            result.warnings.append(f"Translation failed (non-fatal): {exc}")
-            result.stage_latencies["translation"] = time.perf_counter() - stage_start
+    report_progress("Quiz complete", 0.95)
 
     result.total_latency_s = time.perf_counter() - wall_start
     report_progress("Pipeline complete", 1.0)

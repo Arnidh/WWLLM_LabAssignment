@@ -18,12 +18,10 @@ flowchart LR
     A[🎙 Audio Upload\nwav/mp3/m4a] --> B[Audio Processing\nsrc/audio.py\n16kHz mono chunks]
     B --> C[ASR\nIndicConformer 600M\nsrc/asr.py]
     C --> D[Transcript\nper-chunk + timestamps]
-    D --> E[Notes Generator\nParam-1 Instruct\nsrc/notes.py]
-    D --> F[MCQ Generator\nParam-1 Instruct\nsrc/quiz.py]
-    E --> G{Translate?\nIndicTrans2\nsrc/translate.py}
-    G -->|Yes| H[Translated Notes]
-    G -->|No| I[Notes only]
-    E & F & H --> J[Gradio UI\napp.py\nTabs: Transcript/Notes/Quiz/Translation]
+    D --> G{Translate transcript?\nIndicTrans2\nsrc/translate.py}
+    G --> H[Notes Generator\nParam-1 Instruct\nsrc/notes.py]
+    G --> I[MCQ Generator\nParam-1 Instruct\nsrc/quiz.py]
+    D & G & H & I --> J[Gradio UI\napp.py\nTabs: Transcript/Translation/Notes/Quiz]
 ```
 
 ---
@@ -59,9 +57,9 @@ lecture-notes-quiz/
 │   └── utils.py            # Config, logging, JSON repair
 ├── eval/                   # Evaluation suite
 ├── data/
-│   ├── audio/              # Sample lecture clips
+│   ├── audio/              # Locally downloaded benchmark audio (not committed)
 │   ├── reference_transcripts/
-│   └── test_cases.csv      # 30 test cases
+│   └── test_cases.csv      # Generated FLEURS sample manifest
 ├── results/                # Metrics, charts, failure analysis
 ├── notebooks/colab_run.ipynb
 ├── docs/
@@ -137,6 +135,13 @@ python app.py --port 8080
 ```
 
 Visit `http://localhost:7860` in your browser.
+The transcript tab always shows the original ASR output. Select a target
+language (English by default) to translate the transcript; notes and quiz
+questions are then generated in that language. Choose **No translation** to
+generate all outputs in the lecture language. The Notes and Quiz tabs include
+PDF downloads alongside the existing Markdown and JSON downloads. PDF exports
+embed an installed Unicode font when needed for Indic scripts (Nirmala UI on
+Windows or the matching Noto Sans font on Linux).
 
 ## Running ASR locally
 
@@ -169,9 +174,9 @@ BharatGen Shrutam-2 fallback is attempted. Its model license is non-commercial;
 its model card's setup uses Python 3.10.14, so use that runtime if the fallback
 reports a Python/API compatibility error.
 
-Real mode requires a sample audio file. The repository currently has no sample
-clip; use a Hindi WAV/MP3/M4A file or upload one in the Gradio UI. Audio decoding
-for MP3/M4A requires FFmpeg on `PATH`. The transcript smoke test can be run
+The repository does not track audio files. Prepare the reproducible benchmark
+below or upload a Hindi WAV/MP3/M4A file in the Gradio UI. Audio decoding for
+MP3/M4A requires FFmpeg on `PATH`. The transcript smoke test can be run
 independently of the downstream notes/quiz models:
 
 ```powershell
@@ -205,17 +210,43 @@ details and the unresolved license discrepancy.
 
 ## Running the Evaluation
 
+The reproducible ASR benchmark uses 10 held-out FLEURS read-speech examples
+each in Hindi, Kannada, and Tamil (30 total). The manifest pins the dataset
+revision, test split, and CC-BY-4.0 license. FLEURS is based on read sentences,
+not lectures; it does not measure lecture summarization, noisy/fast speech, or
+code-switching. The downloader keeps audio local and does not commit it.
+
 ```bash
-# Run all evaluations:
+# Download the audio subset and regenerate data/test_cases.csv:
+python eval/prepare_fleurs_eval.py --per-language 10 --seed 3235
+
+# Run real ASR on a machine with sufficient RAM (requires HF_TOKEN):
+python eval/run_asr_inference.py
+
+# Score real transcripts; fails if any referenced sample is missing:
+python eval/wer_eval.py --test-cases data/test_cases.csv --transcripts-dir results/transcripts
+
+# Run available evaluations (notes/quiz are skipped unless outputs exist):
 python eval/run_all.py
 
-# Individual evaluations:
-python eval/wer_eval.py --test-cases data/test_cases.csv --transcripts-dir results/transcripts/
-python eval/notes_eval.py --test-cases data/test_cases.csv --notes-dir results/notes/
-python eval/mcq_eval.py  --test-cases data/test_cases.csv --quiz-dir results/quiz/
+# Optional: validate generated notes/quiz after creating them through the app:
+python eval/notes_eval.py --test-cases data/test_cases.csv --notes-dir results/notes
+python eval/mcq_eval.py --test-cases data/test_cases.csv --quiz-dir results/quiz
 ```
 
-Charts are saved to `results/figures/`. Manual rating templates are in `results/*_ratings_template.csv`.
+WER/CER per sample is saved to `results/wer_results.csv`; corpus and
+language-specific rates are in `results/wer_summary.json`. Model, backend,
+latency, and dataset provenance are in `results/asr_inference_metadata.json`.
+Charts are saved to `results/figures/`. Notes and quiz metrics are not reported
+for FLEURS because it has no reference notes or quiz answers.
+
+The IndicConformer repository contains 405 files (about 2.56 GB), and its
+custom loader downloads the full snapshot. This workspace had about 1.6 GB of
+free RAM, so the smoke test was stopped before inference rather than risking a
+resource-exhaustion failure. No real WER/CER results are claimed here. Use the
+existing Colab T4 setup or another
+machine with sufficient available memory before running the ASR and scoring
+commands.
 
 ---
 
@@ -232,38 +263,28 @@ need a GPU, HF token, or real lecture recording.
 
 ## Results Summary
 
-> **TODO**: Fill in after running evaluation on real audio.
+The FLEURS subset is prepared, but real inference was stopped before model
+loading completed because of the local resource constraint.
 
 | Metric | Value |
 |--------|-------|
-| ASR WER (clean Hindi) | TODO |
-| ASR CER (clean Hindi) | TODO |
-| Notes keyword coverage (avg) | TODO |
-| Notes factual consistency (manual avg) | TODO/5 |
-| MCQ auto-validity (avg per sample) | TODO/5 |
-| MCQ clarity (manual avg) | TODO/5 |
-| Translation chrF (hi→en) | TODO |
+| FLEURS test subset | 30 clips (10 each: Hindi, Kannada, Tamil) |
+| ASR corpus WER/CER | Not run; see the resource limitation above |
+| Notes / quiz / translation quality | Not measured on FLEURS; no gold references |
 
 See `results/failure_analysis.md` for failure analysis.
 
 ---
 
-## Screenshots
-
-> **TODO**: Add screenshots after taking them.
-
-| | |
-|--|--|
-| ![Main UI](docs/screenshots/ui_main.png) | ![Quiz Tab](docs/screenshots/ui_quiz.png) |
-| Main UI | Interactive Quiz |
-
 ---
 
 ## Limitations
 
-- **Language coverage**: Best quality for Hindi. Kannada and Tamil need more test data.
+- **Benchmark scope**: FLEURS contains read speech, not lecture recordings, and does not cover noise, fast speech, or code-switching.
+- **Language coverage**: Hindi, Kannada, and Tamil have a small ASR test subset; results should not be generalized to all speakers or lecture conditions.
 - **Memory**: T4 quantized loading is provided as an option but has not yet been verified for this checkpoint.
-- **Noisy audio**: WER degrades significantly with background noise.
+- **Local ASR inference**: The custom IndicConformer loader snapshots a 2.56 GB repository; the smoke test was stopped before inference because available memory was limited. Real metrics require a better-provisioned runtime.
+- **Unmeasured conditions**: Noise, speaking rate, code-switching, and long lectures are not covered by the FLEURS evaluation.
 - **Context window**: Very long lectures (>30 min) trigger map-reduce which may lose nuance.
 - **No speaker diarisation**: Multiple speakers are merged without attribution.
 
@@ -278,21 +299,12 @@ See `results/failure_analysis.md` for failure analysis.
 
 ---
 
-## Manual TODO Before Submission
+## Remaining Evaluation Work
 
-See the checklist at the end of this README.
-
----
-
-## Checklist (Manual Steps Before Submission)
-
-- [ ] Record or download 30 audio clips matching `data/test_cases.csv`
-- [ ] Write reference transcripts in `data/reference_transcripts/`
-- [ ] Run `python eval/run_all.py` and fill in results
-- [ ] Manually rate notes (`results/notes_ratings_template.csv`)
-- [ ] Manually rate MCQs (`results/mcq_ratings_template.csv`)
-- [ ] Fill in `docs/MODEL_NOTES.md` with verified checkpoint details
-- [ ] Take screenshots and add to `docs/screenshots/`
-- [ ] Update Results Summary table above with real numbers
-- [ ] Push to GitHub and add repo URL to submission form
-- [ ] Record a 3-minute demo video following `docs/DEMO_SCRIPT.md`
+- The FLEURS benchmark measures ASR on read speech only. A separate, licensed
+  lecture dataset and human reference notes/questions are needed to measure
+  lecture-specific performance.
+- Human ratings of note factuality and quiz quality are not included; do not
+  interpret structural validation as a human quality score.
+- The sample count is intentionally small (10 clips per language) and is not a
+  broad language or speaker benchmark.

@@ -109,10 +109,9 @@ def run_notes_eval(
                     "language": row.get("language", ""),
                     "test_type": row.get("test_type", ""),
                     "keyword_coverage_auto": cov,
-                    # TODO: fill in manually
-                    "factual_consistency_1_5": "TODO",
-                    "completeness_1_5": "TODO",
-                    "clarity_1_5": "TODO",
+                    "factual_consistency_1_5": "",
+                    "completeness_1_5": "",
+                    "clarity_1_5": "",
                     "rater_notes": "",
                 }
             )
@@ -135,7 +134,8 @@ def run_notes_eval(
             writer.writeheader()
             writer.writerows(rating_rows)
         logger.info(
-            "Manual rating template → %s  (fill in the TODO columns)", ratings_template_csv
+            "Manual rating template → %s  (rating fields are intentionally blank)",
+            ratings_template_csv,
         )
 
     print(f"\nAuto results: {output_csv}")
@@ -152,4 +152,3 @@ if __name__ == "__main__":
     run_notes_eval(
         args.test_cases, args.notes_dir, args.output_csv, args.ratings_template
     )
-

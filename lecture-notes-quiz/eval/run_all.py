@@ -35,7 +35,7 @@ def _ensure_dirs() -> None:
 
 
 def _make_charts() -> None:
-    """Generate 3 summary charts (placeholders if results CSVs are empty)."""
+    """Generate charts for evaluation result files that contain samples."""
     try:
         import matplotlib.pyplot as plt
         import pandas as pd
@@ -140,22 +140,30 @@ def main() -> None:
         str(RESULTS / "wer_results.csv"),
     )
 
-    logger.info("=== Running Notes evaluation ===")
-    run_notes_eval(
-        "data/test_cases.csv",
-        str(RESULTS / "notes"),
-        str(RESULTS / "notes_results.csv"),
-        str(RESULTS / "notes_ratings_template.csv"),
-    )
+    if any((RESULTS / "notes").glob("*.md")):
+        logger.info("=== Running Notes evaluation ===")
+        run_notes_eval(
+            "data/test_cases.csv",
+            str(RESULTS / "notes"),
+            str(RESULTS / "notes_results.csv"),
+            str(RESULTS / "notes_ratings_template.csv"),
+        )
+    else:
+        logger.info(
+            "Skipping Notes evaluation: no generated notes or gold note labels."
+        )
 
-    logger.info("=== Running MCQ evaluation ===")
-    run_mcq_eval(
-        "data/test_cases.csv",
-        str(RESULTS / "quiz"),
-        str(RESULTS / "transcripts"),
-        str(RESULTS / "mcq_results.csv"),
-        str(RESULTS / "mcq_ratings_template.csv"),
-    )
+    if any((RESULTS / "quiz").glob("*.json")):
+        logger.info("=== Running MCQ evaluation ===")
+        run_mcq_eval(
+            "data/test_cases.csv",
+            str(RESULTS / "quiz"),
+            str(RESULTS / "transcripts"),
+            str(RESULTS / "mcq_results.csv"),
+            str(RESULTS / "mcq_ratings_template.csv"),
+        )
+    else:
+        logger.info("Skipping MCQ evaluation: no generated quiz files.")
 
     _make_charts()
     _write_summary_table()
@@ -165,4 +173,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

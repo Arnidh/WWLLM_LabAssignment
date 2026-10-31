@@ -148,6 +148,11 @@ def free_gpu_memory() -> None:
     logger.info("ASR model freed from memory.")
 
 
+def get_active_backend() -> str:
+    """Return the backend loaded by the most recent real transcription."""
+    return _asr_backend
+
+
 # ── Transcription ─────────────────────────────────────────────────────────────
 
 @dataclass

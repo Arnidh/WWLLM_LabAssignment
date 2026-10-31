@@ -71,6 +71,12 @@ Official source: [Shrutam-2 model card](https://huggingface.co/bharatgenai/Shrut
 - IndicConformer HF metadata reports automatic gating; if access is denied, use
   an accepted HF token. The app preserves the Hub's error and also reports any
   fallback-loading error.
+- The gated ONNX weight endpoint returned an authorized response, but this is
+  not proof that local inference succeeds. The model's custom
+  `from_pretrained` implementation calls `snapshot_download` without filters;
+  the pinned repository has 405 files totaling about 2.56 GB. A local load was
+  stopped before inference because only about 1.6 GB of RAM was free; an actual
+  out-of-memory failure was not observed.
 - The HF checkpoint's documented ONNX path does not expose a dtype/fp16 option.
   The wrapper does not invent a precision override; CUDA acceleration requires
   a CUDA-enabled ONNX Runtime installation.
@@ -159,39 +165,25 @@ and [Hub chat_template.jinja](https://huggingface.co/bharatgenai/Param-1-2.9B-In
 
 ---
 
-## 3. Translation — AI4Bharat IndicTrans2 (distilled 200 M)
+## 3. Translation — AI4Bharat IndicTrans2 (configured; not inference-verified)
 
 | Direction | HF ID | Verified |
 |-----------|--------|---------|
-| Indic → English | `ai4bharat/indictrans2-indic-en-dist-200M` | TODO |
-| English → Indic | `ai4bharat/indictrans2-en-indic-dist-200M` | TODO |
-| Indic → Indic | `ai4bharat/indictrans2-indic-indic-dist-320M` | TODO |
+| Indic → English | `ai4bharat/indictrans2-indic-en-dist-200M` | Checkpoint is configured; real loading/translation not verified |
+| English → Indic | `ai4bharat/indictrans2-en-indic-dist-200M` | Checkpoint is configured; real loading/translation not verified |
+| Indic → Indic | `ai4bharat/indictrans2-indic-indic-dist-320M` | Checkpoint is configured; real loading/translation not verified |
 
 | Field | Value |
 |-------|-------|
-| **Toolkit** | `IndicTransToolkit` (pip install via GitHub) |
-| **Language codes** | Flores-200 (e.g., `hin_Deva`, `kan_Knda`, `eng_Latn`) |
-| **License** | MIT (verify) |
-| **HF Token required** | No (public) |
-| **trust_remote_code** | Yes |
-| **Input** | List of sentences (pre-processed via IndicProcessor) |
-| **Output** | List of translated sentences |
+| **Toolkit** | `IndicTransToolkit` is referenced by the wrapper; installation and import path are not verified here |
+| **Language codes** | The wrapper configures Flores-200-style codes; mappings have not been checked by a real translation call |
+| **License / token / remote-code behavior** | Not independently verified for these checkpoints |
+| **Inference** | No verified usage snippet is included because a real model call has not been run |
 
-### Flores-200 Language Code Table
-| BCP-47 | Flores-200 | Language |
-|--------|-----------|---------|
-| hi | hin_Deva | Hindi |
-| en | eng_Latn | English |
-| kn | kan_Knda | Kannada |
-| ta | tam_Taml | Tamil |
-| te | tel_Telu | Telugu |
-| mr | mar_Deva | Marathi |
-| bn | ben_Beng | Bengali |
-
-### Verified Usage (from IndicTrans2 README)
-```python
-# TODO: copy verified snippet from https://github.com/AI4Bharat/IndicTrans2
-```
+The translation checkpoints and wrapper are part of the project, but no
+translation score or quality claim should be reported until model access,
+runtime compatibility, licensing, and a real translation example are checked
+against the official [IndicTrans2 repository](https://github.com/AI4Bharat/IndicTrans2).
 
 ---
 
@@ -200,7 +192,7 @@ and [Hub chat_template.jinja](https://huggingface.co/bharatgenai/Param-1-2.9B-In
 - [x] IndicConformer: verify exact HF model ID, MIT license, and 22 language codes
 - [x] IndicConformer: verify language code format (`"hi"`, `"kn"`, etc.)
 - [x] IndicConformer: confirm `trust_remote_code=True` and documented `AutoModel` API
-- [ ] IndicConformer: run a real smoke test with accepted gated-model access
+- [ ] IndicConformer: run a real inference smoke test on a machine with sufficient RAM (not completed locally)
 - [x] BharatGen fallback: verify Shrutam-2 ID, documented API, coverage, and license
 - [x] Param-1: verify exact instruct checkpoint ID and 8,192 positional limit
 - [x] Param-1: verify tokenizer chat-template API and message roles
