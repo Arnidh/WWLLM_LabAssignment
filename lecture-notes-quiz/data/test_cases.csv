@@ -1,0 +1,32 @@
+id,audio_file,language,test_type,reference_text,notes
+tc01,data/audio/hindi_clean_01.wav,hi,clean,"नमस्ते आज हम न्यूटन के गति के नियमों के बारे में पढ़ेंगे","[""जड़त्व"", ""F=ma"", ""बल"", ""त्वरण""]"
+tc02,data/audio/hindi_noisy_01.wav,hi,noisy,"न्यूटन का पहला नियम जड़त्व का नियम है","[""जड़त्व"", ""पहला नियम""]"
+tc03,data/audio/hindi_fast_01.wav,hi,fast,"बल द्रव्यमान और त्वरण का गुणनफल होता है","[""बल"", ""द्रव्यमान"", ""त्वरण""]"
+tc04,data/audio/hindi_codemix_01.wav,hi,code_mixed,"आज हम machine learning के concepts पढ़ेंगे जैसे gradient descent और backpropagation","[""machine learning"", ""gradient descent"", ""backpropagation""]"
+tc05,data/audio/hindi_numbers_01.wav,hi,numbers_dates,"सन 1687 में न्यूटन ने Principia Mathematica प्रकाशित की जिसमें 3 नियम दिए","[""1687"", ""Principia"", ""3 नियम""]"
+tc06,data/audio/hindi_short_01.wav,hi,short,"नमस्ते","[""नमस्ते""]"
+tc07,data/audio/hindi_long_01.wav,hi,long,"TODO: long lecture transcript (>10 minutes)","[""TODO""]"
+tc08,data/audio/silent_01.wav,hi,edge_case,,
+tc09,data/audio/non_lecture_01.wav,hi,edge_case,,
+tc10,data/audio/hindi_clean_02.wav,hi,clean,"पृथ्वी सूर्य के चारों ओर घूमती है इस प्रक्रिया में गुरुत्वाकर्षण बल काम करता है","[""पृथ्वी"", ""सूर्य"", ""गुरुत्वाकर्षण""]"
+tc11,data/audio/kannada_clean_01.wav,kn,clean,,
+tc12,data/audio/tamil_clean_01.wav,ta,clean,,
+tc13,data/audio/hindi_codemix_02.wav,hi,code_mixed,"neural network में weights और biases होते हैं","[""neural network"", ""weights"", ""biases""]"
+tc14,data/audio/hindi_numbers_02.wav,hi,numbers_dates,"प्रकाश की गति 3 लाख किलोमीटर प्रति सेकंड है","[""प्रकाश"", ""3 लाख"", ""किलोमीटर""]"
+tc15,data/audio/hindi_clean_03.wav,hi,clean,"ऊर्जा न तो बनाई जा सकती है और न ही नष्ट की जा सकती है","[""ऊर्जा"", ""संरक्षण""]"
+tc16,data/audio/hindi_noisy_02.wav,hi,noisy,,
+tc17,data/audio/hindi_fast_02.wav,hi,fast,,
+tc18,data/audio/hindi_clean_04.wav,hi,clean,,
+tc19,data/audio/hindi_codemix_03.wav,hi,code_mixed,,
+tc20,data/audio/hindi_long_02.wav,hi,long,,
+tc21,data/audio/hindi_clean_05.wav,hi,clean,,
+tc22,data/audio/hindi_numbers_03.wav,hi,numbers_dates,,
+tc23,data/audio/hindi_noisy_03.wav,hi,noisy,,
+tc24,data/audio/hindi_short_02.wav,hi,short,,
+tc25,data/audio/hindi_short_03.wav,hi,short,,
+tc26,data/audio/kannada_clean_02.wav,kn,clean,,
+tc27,data/audio/tamil_clean_02.wav,ta,clean,,
+tc28,data/audio/hindi_clean_06.wav,hi,clean,,
+tc29,data/audio/hindi_fast_03.wav,hi,fast,,
+tc30,data/audio/hindi_codemix_04.wav,hi,code_mixed,,
+

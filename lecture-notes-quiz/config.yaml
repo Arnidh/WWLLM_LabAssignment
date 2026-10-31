@@ -1,0 +1,94 @@
+# ──────────────────────────────────────────────
+# Multilingual Lecture-to-Notes & Quiz Generator
+# Configuration file
+# ──────────────────────────────────────────────
+
+# ── Language settings ─────────────────────────
+default_language: "hi"          # BCP-47 code used at startup (Hindi)
+# Add more codes as you onboard models:
+supported_languages:
+  hi: "Hindi"
+  kn: "Kannada"
+  ta: "Tamil"
+  en: "English"
+asr_supported_languages:
+  - as
+  - bn
+  - brx
+  - doi
+  - gu
+  - hi
+  - kn
+  - kok
+  - ks
+  - mai
+  - ml
+  - mni
+  - mr
+  - ne
+  - or
+  - pa
+  - sa
+  - sat
+  - sd
+  - ta
+  - te
+  - ur
+
+# Translation target languages (IndicTrans2 supports 22 Indian langs + English)
+translation_targets:
+  en: "English"
+  hi: "Hindi"
+  kn: "Kannada"
+  ta: "Tamil"
+  te: "Telugu"
+  mr: "Marathi"
+  bn: "Bengali"
+
+# ── Model IDs ─────────────────────────────────
+models:
+  # ASR: IndicConformer (multilingual, 600 M params)
+  # HF hub: ai4bharat/indic-conformer-600m-multilingual
+  # Paper: https://arxiv.org/abs/2407.13738
+  asr_primary: "ai4bharat/indic-conformer-600m-multilingual"
+  asr_fallback: "bharatgenai/Shrutam-2"          # verified fallback; non-commercial
+
+  # Notes + MCQ: BharatGen Param-1 2.9B instruct
+  # Verified card: https://huggingface.co/bharatgenai/Param-1-2.9B-Instruct
+  llm: "bharatgenai/Param-1-2.9B-Instruct"
+
+  # Translation: IndicTrans2 distilled 200 M
+  # HF hub: ai4bharat/indictrans2-indic-en-dist-200M (en target)
+  #         ai4bharat/indictrans2-en-indic-dist-200M (indic target)
+  translation_to_en:    "ai4bharat/indictrans2-indic-en-dist-200M"
+  translation_to_indic: "ai4bharat/indictrans2-en-indic-dist-200M"
+  translation_indic_indic: "ai4bharat/indictrans2-indic-indic-dist-320M"
+
+# ── Audio processing ──────────────────────────
+audio:
+  sample_rate: 16000          # Hz – IndicConformer expects 16 kHz mono
+  chunk_length_s: 30          # seconds per chunk
+  overlap_s: 1                # overlap between adjacent chunks
+  silence_split: true         # try silence-based splitting first (pydub)
+  silence_thresh_dbfs: -40    # silence threshold for splitting
+
+# ── LLM generation parameters ─────────────────
+generation:
+  max_new_tokens_notes: 800
+  max_new_tokens_mcq: 1200
+  temperature: 0.2            # capped at 0.3 for grounding
+  top_p: 0.85
+  repetition_penalty: 1.1
+  mcq_retry_limit: 2          # maximum repairs (initial attempt + 2) for invalid JSON
+
+# ── Memory / quantisation ─────────────────────
+memory:
+  llm_quantization: "fp16"    # fp16 | int8 | int4 | none; quantized modes need CUDA
+  free_gpu_between_stages: true
+  free_asr_before_llm: true   # ASR and Param-1 need not stay resident together
+
+# ── Context window management ─────────────────
+context:
+  model_max_tokens: 8192       # from Param-1 config.json
+  max_input_tokens: 6000       # prompt budget; leaves room for generation
+  map_reduce_chunk_size: 1200  # tokenizer tokens per source group
